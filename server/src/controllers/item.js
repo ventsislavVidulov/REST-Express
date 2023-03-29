@@ -2,6 +2,7 @@ import { Router } from 'express';
 const router = Router();
 
 import api from '../services/item.js'
+import { errorMapper } from '../utils/errorMapper.js';
 
 router.get('/', async (req, res) => {
     res.json(await api.getAll());
@@ -22,7 +23,13 @@ router.post('/', async (req, res) => {
         res.json(result);
     } catch (error) {
         console.error(error);
-        res.status(400).json({ message: 'Request error' });
+        const message = errorMapper(error);
+        res.status(400).json({ message });
+        // if (message) {
+        //     res.status(400).json({ message });
+        // } else {
+        //     res.status(400).json({ message: 'Request error' }); 
+        // }
     }
 });
 

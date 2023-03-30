@@ -9,7 +9,9 @@ const itemSchema = new Schema({
         max: [2050, 'Choose year between 1950 and 2050']
     },
     description: { type: String },
-    price: { type: Number },
+    price: { type: Number,
+    min: [0.01, 'Price must be positive']
+    },
     img: { type: String },
     material: { type: String }
 });

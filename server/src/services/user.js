@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { User } from "../models/User.js";
 
 const JWT_SECRET = 'onrvnnosnvjolsfnvolnsjlvnvolnjfnen';
+const blacklist = new Set();
 
 async function register(email, password) {
     //Checking if the email is used
@@ -41,13 +42,20 @@ async function login(email, password) {
 }
 
 
+function logout(token) {
+    blacklist.add(token)
+}
+
+
 function createSession(user) {
     const payload = {
         email: user.email,
         _id: user._id
     };
 
-    const accessToken = jwt.sign(payload, JWT_SECRET);
+    const accessToken = jwt.sign(payload, JWT_SECRET, {
+        expiresIn: '1d'
+    });
 
     return {
         email: user.email,
@@ -57,7 +65,16 @@ function createSession(user) {
 }
 
 
+function validateToken(token) {
+    if (blacklist.has(token)) {
+        throw new Error('Token is blacklisted')
+    }
+    return jwt.verify(token, JWT_SECRET);
+}
+
 export default {
     register,
-    login
+    login,
+    logout,
+    validateToken
 };

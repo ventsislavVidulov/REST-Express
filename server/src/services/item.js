@@ -12,7 +12,8 @@ async function create(item) {
         description: item.description,
         price: item.price,
         img: item.img,
-        material: item.material
+        material: item.material,
+        _ownerId: item._ownerId
     });
 
     await result.save();

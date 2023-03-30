@@ -16,7 +16,8 @@ router.post('/', async (req, res) => {
         description: req.body.description,
         price: req.body.price,
         img: req.body.img,
-        material: req.body.material
+        material: req.body.material,
+        _ownerId: req.user._id
     }
     try {
         const result = await api.create(item);

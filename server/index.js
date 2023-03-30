@@ -4,6 +4,7 @@ import express from 'express';
 import cors from './src/middlewares/cors.js';
 import itemController from './src/controllers/item.js';
 import userController from './src/controllers/user.js'
+import { authMiddleware } from './src/middlewares/auth.js';
 
 async function start() {
     try {
@@ -18,6 +19,7 @@ async function start() {
 
     app.use(express.json());
     app.use(cors());
+    app.use(authMiddleware());
 
     app.use('/data/catalog', itemController);
     app.use('/users', userController);

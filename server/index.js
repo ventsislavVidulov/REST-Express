@@ -3,6 +3,7 @@ import express from 'express';
 
 import cors from './src/middlewares/cors.js';
 import itemController from './src/controllers/item.js';
+import userController from './src/controllers/user.js'
 
 async function start() {
     try {
@@ -19,6 +20,7 @@ async function start() {
     app.use(cors());
 
     app.use('/data/catalog', itemController);
+    app.use('/users', userController);
 
     app.listen(3030, () => console.log('REST service started on port 3030'));
 

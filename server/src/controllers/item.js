@@ -3,12 +3,19 @@ const router = Router();
 
 import api from '../services/item.js'
 import { errorMapper } from '../utils/errorMapper.js';
+import { isAuth, isAuthor } from '../middlewares/guards.js';
+import { preload } from '../middlewares/preload.js';
 
 router.get('/', async (req, res) => {
-    res.json(await api.getAll());
+    try {
+        res.json(await api.getAll(req.query.where));
+    } catch (error) {
+        res.status(400).json({messagr: 'Bad request'});
+    }
 });
 
-router.post('/', async (req, res) => {
+
+router.post('/', isAuth(), async (req, res) => {
     const item = {
         make: req.body.make,
         model: req.body.model,
@@ -34,49 +41,27 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
-    const id = req.params.id;
 
-    try {
-        const item = await api.getById(id);
-        if (item) {
-            res.json(item);
-        }
-    } catch (error) {
-        console.error(error.message);
-        res.status(404).json({ message: 'Item not found' });
-    }
+router.get('/:id', preload(api), async (req, res) => {
+    res.json(res.locals.item);
 });
 
-router.put('/:id', async (req, res) => {
-    const id = req.params.id;
 
-    const item = {
-        make: req.body.make,
-        model: req.body.model,
-        year: req.body.year,
-        description: req.body.description,
-        price: req.body.price,
-        img: req.body.img,
-        material: req.body.material
-    }
+router.put('/:id', preload(api), isAuthor(), async (req, res) => {
     try {
-        const result = await api.updateById(id, item);
+        const result = await api.updateById(res.locals.item, req.body);
         res.json(result);
     } catch (error) {
-        if (error._notFound) {
-            res.status(404).json({ message: 'Item not found' });
-        } else {
-            console.error(error);
-            res.status(400).json({ message: 'Request error' });
-        }
+        console.error(error);
+        res.status(400).json({ message: 'Request error' });
     }
 });
 
-router.delete('/:id', async (req, res) => {
-    const id = req.params.id;
+
+router.delete('/:id', preload(api), isAuthor(), async (req, res) => {
+    // const id = req.params.id;
     try {
-        const result = await api.deleteById(id);
+        const result = await api.deleteById(res.locals.item);
         res.json(result);
     } catch (error) {
         console.error(error);

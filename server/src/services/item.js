@@ -1,6 +1,10 @@
 import { Item } from "../models/Item.js";
 
-async function getAll() {
+async function getAll(query) {
+    if (query) {
+        const userId = query.split('=')[1].slice(1, -1);
+        return Item.find({ _ownerId: userId });
+    }
     return Item.find({});
 }
 
@@ -30,29 +34,23 @@ async function getById(id) {
     }
 }
 
-async function updateById(id, item) {
-    const existing = await Item.findById(id);
+async function updateById(existing, item) {
 
-    if (existing) {
-        existing.make = item.make;
-        existing.model = item.model;
-        existing.year = item.year;
-        existing.description = item.description;
-        existing.price = item.price;
-        existing.img = item.img;
-        existing.material = item.material;
-        // console.log(existing);
-        await existing.save();
-        return existing;
-    } else {
-        const error = new Error('Not found');
-        error._notFound = true;
-        throw error;
-    }
+    existing.make = item.make;
+    existing.model = item.model;
+    existing.year = item.year;
+    existing.description = item.description;
+    existing.price = item.price;
+    existing.img = item.img;
+    existing.material = item.material;
+
+    await existing.save();
+    return existing;
+
 }
 
-async function deleteById(id) {
-    await Item.findByIdAndDelete(id);
+async function deleteById(item) {
+    await Item.findByIdAndDelete(item._id);
 }
 
 export default {
